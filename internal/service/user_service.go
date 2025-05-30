@@ -15,6 +15,7 @@ type UserService interface {
 	GetUserByEmail(email string) (model.User, error)
 	CreateUser(user model.CreateUserRequest) (bool, error)
 	GetUserById(id string) (model.UserResponse, error)
+	UpdateUser(user model.UserUpdateRequest) (bool, error)
 }
 
 type userService struct {
@@ -74,4 +75,26 @@ func (s *userService) GetUserById(id string) (model.UserResponse, error) {
 		return model.UserResponse{}, fmt.Errorf("failed to get user by id: %w", err)
 	}
 	return user, nil
+}
+
+func (s *userService) UpdateUser(user model.UserUpdateRequest) (bool, error) {
+	existingUser, err := s.repo.FindUserByEmail(user.Email)
+	if err != nil {
+		if errors.Is(err, repository.ErrUserNotFound) {
+			return false, fmt.Errorf("user not found")
+		}
+		return false, fmt.Errorf("failed to get user by email: %w", err)
+	}
+
+	updateUser, err := s.repo.UpdateUser(model.UserResponse{
+		Id:    existingUser.Id,
+		Name:  user.Name,
+		Email: user.Email,
+	})
+	if err != nil {
+		logger.Error("failed to update user", err)
+		return false, fmt.Errorf("failed to update user: %w", err)
+	}
+	logger.Info("user updated successfully")
+	return updateUser, nil
 }

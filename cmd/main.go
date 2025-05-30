@@ -35,6 +35,7 @@ func main() {
 	r.GET("/user/id/:id", userController.GetUserById)
 	r.GET("/user/:email", userController.GetUserByEmail)
 	r.POST("/user", userController.CreateUser)
+	r.PUT("/user", userController.UpdateUser)
 	r.GET("/index", func(c *gin.Context) {
 		users, err := userService.GetAllUsers()
 		fmt.Println("isi users", users)

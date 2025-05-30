@@ -1,24 +1,137 @@
-<html>
-	<body>
-    <h1>
-		{{ .title }}
-	</h1>
-    <h2>List of Users</h2>
-    <table border="1">
-    <tr>
-        <th>Id</th>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Phone Number</th>
-    </tr>
-    {{ range .users }}
-    <tr>
-        <td>{{ .Id }}</td>
-        <td>{{ .Name }}</td>
-        <td>{{ .Email }}</td>
-        <td>{{ .PhoneNumber }}</td>
-    </tr>
-    {{ end }}
-    </table>
-    </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .title }}</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9fafb;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1.25rem;
+            color: #6b7280;
+            font-weight: 400;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background-color: #f3f4f6;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 500;
+            color: #374151;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+        
+        td {
+            padding: 1rem;
+            border-top: 1px solid #e5e7eb;
+            color: #4b5563;
+        }
+        
+        tr:hover td {
+            background-color: #f9fafb;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">{{ .title }}</h1>
+            <p class="subtitle">Management System Users</p>
+        </div>
+        
+        <div class="table-container">
+            {{ if .users }}
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{ range .users }}
+                    <tr>
+                        <td>#{{ .Id }}</td>
+                        <td>
+                            <div style="font-weight: 500; color: #111827;">{{ .Name }}</div>
+                        </td>
+                        <td>{{ .Email }}</td>
+                        <td>{{ .PhoneNumber }}</td>
+
+                    </tr>
+                    {{ end }}
+                </tbody>
+            </table>
+            {{ else }}
+            <div class="empty-state">
+                <svg style="width: 3rem; height: 3rem; margin-bottom: 1rem; color: #9ca3af;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">No users found</h3>
+                <p style="color: #9ca3af;">There are currently no users in the system</p>
+            </div>
+            {{ end }}
+        </div>
+    </div>
+</body>
 </html>

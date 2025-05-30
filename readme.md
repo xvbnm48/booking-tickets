@@ -10,7 +10,9 @@ Simple ticket service using golang.
 - [x] create structure service
 - [x] logger
 - [x] connect to database
-- [ ] create model
-- [ ] create repository
-- [ ] create service
-- [ ] create handler
+- [x] create model
+- [x] create repository
+- [x] create service
+- [x] create handler
+- [x] create update user
+- [x] create lupa password

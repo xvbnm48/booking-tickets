@@ -15,6 +15,7 @@ type UserRepository interface {
 	CreateUser(user model.CreateUserRequest) (bool, error)
 	CheckEmailExists(email string) (bool, error)
 	FindUserById(id string) (model.UserResponse, error)
+	UpdateUser(user model.UserResponse) (bool, error)
 }
 
 type userRepository struct {
@@ -67,8 +68,13 @@ func (r *userRepository) FindUserByEmail(email string) (model.User, error) {
 
 func (r *userRepository) CreateUser(user model.CreateUserRequest) (bool, error) {
 	logger.Info("Create new user")
+	tx, err := r.db.Begin()
+	if err != nil {
+		return false, err
+	}
+	defer tx.Rollback()
 	query := "INSERT INTO users (name, email, password, phone_number) VALUES (?, ?, ?, ?)"
-	result, err := r.db.Exec(query, user.Name, user.Email, user.Password, user.PhoneNumber)
+	result, err := tx.Exec(query, user.Name, user.Email, user.Password, user.PhoneNumber)
 	if err != nil {
 		return false, err
 	}
@@ -111,4 +117,29 @@ func (s *userRepository) FindUserById(id string) (model.UserResponse, error) {
 		return model.UserResponse{}, err
 	}
 	return user, nil
+}
+
+func (s *userRepository) UpdateUser(user model.UserResponse) (bool, error) {
+	logger.Info("Update User")
+	tx, err := s.db.Begin()
+	if err != nil {
+		return false, err
+	}
+	defer tx.Rollback()
+	query := "UPDATE users SET name = ?, email = ?, phone_number = ? WHERE id = ?"
+	result, err := tx.Exec(query, user.Name, user.Email, user.PhoneNumber, user.Id)
+	if err != nil {
+		return false, err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	if rowsAffected == 0 {
+		return false, errors.New("no rows affected")
+	}
+	if err := tx.Commit(); err != nil {
+		return false, err
+	}
+	return true, nil
 }

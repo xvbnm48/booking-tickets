@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator"
 )
 
 type UserController interface {
@@ -14,6 +15,7 @@ type UserController interface {
 	GetUserByEmail(ctx *gin.Context)
 	CreateUser(ctx *gin.Context)
 	GetUserById(ctx *gin.Context)
+	UpdateUser(ctx *gin.Context)
 }
 
 type userController struct {
@@ -88,4 +90,47 @@ func (c *userController) GetUserById(ctx *gin.Context) {
 		Message: "User found",
 		Data:    user,
 	})
+}
+
+func (c *userController) UpdateUser(ctx *gin.Context) {
+	// var req model.UserResponse
+	// if err := ctx.BindJSON(&req); err != nil {
+	// 	ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	// 	return
+	// }
+	// validation input
+
+	var req model.UserUpdateRequest
+	if err := ctx.BindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	validate := validator.New()
+	if err := validate.Struct(req); err != nil {
+		// Format validation errors
+		var errors []string
+		for _, err := range err.(validator.ValidationErrors) {
+			switch err.Tag() {
+			case "required":
+				errors = append(errors, fmt.Sprintf("%s is required", err.Field()))
+			case "email":
+				errors = append(errors, fmt.Sprintf("%s must be a valid email", err.Field()))
+			case "min":
+				errors = append(errors, fmt.Sprintf("%s must be at least %s characters", err.Field(), err.Param()))
+			case "max":
+				errors = append(errors, fmt.Sprintf("%s must be at most %s characters", err.Field(), err.Param()))
+			default:
+				errors = append(errors, fmt.Sprintf("%s is invalid", err.Field()))
+			}
+		}
+		ctx.JSON(http.StatusBadRequest, gin.H{"errors": errors})
+		return
+	}
+	fmt.Println("isi req", req)
+	status, err := c.service.UpdateUser(req)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"status": "Success Update user", "Status": status})
 }

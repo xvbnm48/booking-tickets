@@ -13,6 +13,7 @@ type UserController interface {
 	GetAllUsers(ctx *gin.Context)
 	GetUserByEmail(ctx *gin.Context)
 	CreateUser(ctx *gin.Context)
+	GetUserById(ctx *gin.Context)
 }
 
 type userController struct {
@@ -66,4 +67,25 @@ func (c *userController) CreateUser(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{"status": "Success Crete user", "Status": status})
+}
+
+func (c *userController) GetUserById(ctx *gin.Context) {
+	// id from query parameter
+	// id := ctx.Param("id")
+	id := ctx.Param("id")
+	fmt.Println("isi param id", id)
+	user, err := c.service.GetUserById(id)
+	if err != nil {
+		if err.Error() == "user not found" {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, model.UserResponseStruct{
+		Status:  "Success Get User",
+		Message: "User found",
+		Data:    user,
+	})
 }

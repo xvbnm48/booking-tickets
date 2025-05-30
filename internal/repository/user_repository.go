@@ -14,6 +14,7 @@ type UserRepository interface {
 	FindUserByEmail(email string) (model.User, error)
 	CreateUser(user model.CreateUserRequest) (bool, error)
 	CheckEmailExists(email string) (bool, error)
+	FindUserById(id string) (model.UserResponse, error)
 }
 
 type userRepository struct {
@@ -96,4 +97,18 @@ func (s *userRepository) CheckEmailExists(email string) (bool, error) {
 	}
 
 	return count > 0, nil
+}
+
+func (s *userRepository) FindUserById(id string) (model.UserResponse, error) {
+	logger.Info("Find User By Id")
+	query := "SELECT id, name, email, phone_number FROM users WHERE id = ?"
+	var user model.UserResponse
+	err := s.db.QueryRow(query, id).Scan(&user.Id, &user.Name, &user.Email, &user.PhoneNumber)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return model.UserResponse{}, ErrUserNotFound
+		}
+		return model.UserResponse{}, err
+	}
+	return user, nil
 }

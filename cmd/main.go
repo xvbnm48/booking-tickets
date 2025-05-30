@@ -32,6 +32,7 @@ func main() {
 	userController := controller.NewUserController(userService)
 
 	r.GET("/users", userController.GetAllUsers)
+	r.GET("/user/id/:id", userController.GetUserById)
 	r.GET("/user/:email", userController.GetUserByEmail)
 	r.POST("/user", userController.CreateUser)
 	r.GET("/index", func(c *gin.Context) {

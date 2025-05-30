@@ -25,3 +25,9 @@ type UserResponse struct {
 	Email       string `json:"email"`
 	PhoneNumber string `json:"phone_number"`
 }
+
+type UserResponseStruct struct {
+	Status  string `json:"status"`
+	Message string `json:"message"`
+	Data    any    `json:"data"`
+}

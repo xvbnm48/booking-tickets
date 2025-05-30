@@ -14,6 +14,7 @@ type UserService interface {
 	GetAllUsers() ([]model.UserResponse, error)
 	GetUserByEmail(email string) (model.User, error)
 	CreateUser(user model.CreateUserRequest) (bool, error)
+	GetUserById(id string) (model.UserResponse, error)
 }
 
 type userService struct {
@@ -62,4 +63,15 @@ func (s *userService) CreateUser(user model.CreateUserRequest) (bool, error) {
 	}
 	logger.Info("new user created")
 	return newUser, nil
+}
+
+func (s *userService) GetUserById(id string) (model.UserResponse, error) {
+	user, err := s.repo.FindUserById(id)
+	if err != nil {
+		if errors.Is(err, repository.ErrUserNotFound) {
+			return model.UserResponse{}, fmt.Errorf("user not found")
+		}
+		return model.UserResponse{}, fmt.Errorf("failed to get user by id: %w", err)
+	}
+	return user, nil
 }
